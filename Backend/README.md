@@ -133,3 +133,45 @@ token: JWT token (Optional, if token is in Authorization header)
 ```json 
 curl -X GET http://localhost:3000/users/logout \
 -H "Authorization: Bearer <token>"
+```
+
+## Captain Registration API
+
+### Endpoint: `/captains/register`
+
+### Method: POST
+
+### Description:
+This endpoint is used to register a new captain. It validates the input data, hashes the captain's password, creates a new captain in the database, and returns a JSON Web Token (JWT) along with the captain details.
+
+### Request Body:
+The request body should be a JSON object with the following fields:
+
+- `captain` (object):
+  - `fullname` (object):
+    - `firstname` (string, required, minimum length: 3)
+    - `lastname` (string, optional, minimum length: 3)
+  - `email` (string, required, must be a valid email, minimum length: 5)
+  - `password` (string, required, minimum length: 6)
+  - `vehicle` (object, required):
+    - `color` (string, required)
+    - `plate` (string, required)
+    - `capacity` (number, required)
+    - `vehicleType` (string, required)
+  - `token` (String): JWT Token
+
+### Example Request:
+
+```json
+{
+  "firstname": "John",
+  "lastname": "Doe",
+  "email": "john.doe@example.com",
+  "password": "password123",
+  "vehicle": {
+    "color": "red",
+    "plate": "ABC-123",
+    "capacity": 4,
+    "vehicleType": "sedan"
+  }
+}

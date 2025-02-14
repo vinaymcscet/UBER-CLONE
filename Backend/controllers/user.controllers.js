@@ -10,10 +10,10 @@ const registerUserController = async (req, res, next) => {
     return res.status(400).json({ errors: errors.array() });
   }
   const { fullname, email, password } = req.body;
-  // const isUserAlready = await userModel.findOne({ email });
-  // if (isUserAlready) {
-  //     return res.status(400).json({ message: 'User already exist' });
-  // }
+  const isUserAlready = await userModel.findOne({ email });
+  if (isUserAlready) {
+      return res.status(400).json({ message: 'User already exist' });
+  }
 
   const hashedPassword = await userModel.hashPassword(password);
   const user = await userService.createUser({
