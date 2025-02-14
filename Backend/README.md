@@ -45,3 +45,31 @@ curl -X POST http://localhost:3000/users/register \
   "password": "password123"
 }'
 ```
+
+## Endpoint: `/users/login`
+
+### Method: POST
+
+### Description:
+This endpoint is used to log in an existing user. It validates the input data, checks if the user exists, compares the provided password with the stored hashed password, and returns a JSON Web Token (JWT) along with the user details upon successful authentication.
+
+### Request Body:
+The request body should be a JSON object with the following fields:
+
+- `email` (string, required, must be a valid email)
+- `password` (string, required, minimum length: 6)
+
+### Example Response:
+- `user` (object):
+    - `_id` (string): User's unique identifier.
+    - `fullname` (object):
+        - `firstname` (string): User's first name.
+        - `lastname` (string): User's last name.
+    - `email` (string): User's email address.
+- `token` (String): JWT Token
+
+```json
+{
+  "email": "john.doe@example.com",
+  "password": "password123"
+}
