@@ -68,8 +68,68 @@ The request body should be a JSON object with the following fields:
     - `email` (string): User's email address.
 - `token` (String): JWT Token
 
+## Endpoint: /users/profile
+
+### Method: GET
+
+### Description:
+This endpoint retrieves the profile information of the authenticated user. It uses JWT authentication to verify the user's identity and returns the user details.
+
+### Request Headers:
+Authorization: JWT token in the format Bearer <token>
+
+### Example Response:
+- `user` (object):
+    - `_id` (string): User's unique identifier.
+    - `fullname` (object):
+        - `firstname` (string): User's first name.
+        - `lastname` (string): User's last name.
+    - `email` (string): User's email address.
+
 ```json
 {
-  "email": "john.doe@example.com",
-  "password": "password123"
+  "user": {
+    "_id": "65...",
+    "fullname": {
+      "firstname": "John",
+      "lastname": "Doe"
+    },
+    "email": "john.doe@example.com"
+  }
 }
+```
+
+### Example Usage:
+
+```json
+{
+curl -X GET http://localhost:3000/users/profile \
+-H "Authorization: Bearer <token>"
+}
+```
+
+### Endpoint: /users/logout
+
+### Method: GET
+
+### Description:
+This endpoint logs out the authenticated user by invalidating the JWT token. It clears the token cookie and adds the token to a blacklist to prevent further use.
+
+### Request Headers:
+
+### Authorization: JWT token in the format Bearer <token> (Optional, if token is not in cookies)
+
+### Cookies:
+token: JWT token (Optional, if token is in Authorization header)
+
+### Example Response:
+
+```json 
+{
+  "message": "Logout successfully"
+}
+```
+### Example Usage:
+```json 
+curl -X GET http://localhost:3000/users/logout \
+-H "Authorization: Bearer <token>"
