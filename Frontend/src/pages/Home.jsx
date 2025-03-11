@@ -1,16 +1,153 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React, { useRef, useState } from 'react'
+import { useGSAP } from '@gsap/react';
+import gsap from 'gsap';
+import 'remixicon/fonts/remixicon.css';
+import LocationSearchPanel from '../components/LocationSearchPanel';
+import VehiclePanel from '../components/VehiclePanel';
+import ConfirmRide from '../components/ConfirmRide';
+import LookingForDriver from '../components/LookingForDriver';
+import WaitingForDriver from '../components/WaitingForDriver';
 
 const Home = () => {
+  const [pickup, setPickup] = useState('');
+  const [destination, setDestination] = useState('');
+  const [panelOpen, setPanelOpen] = useState(false);
+  const panelRef = useRef(null)
+  const panelCloseRef = useRef(null)
+  const vehiclePanelRef = useRef(null);
+  const confirmedRidePanelRef = useRef(null);
+  const vehicleFoundRef = useRef(null);
+  const waitingForDriverRef = useRef(null);
+
+  const [vehiclePanel, setVehiclePanel] = useState(false)
+  const [confirmRidePanel, setConfirmedRidePanel] = useState(false)
+  const [vehicleFound, setVehicleFound] = useState(false)
+  const [waitingForDriver, setWaitingForDriver] = useState(false)
+
+  const submitHandler = (e) => {
+    e.preventDefault();
+  }
+
+  useGSAP(function() {
+    if(panelOpen) {
+      gsap.to(panelRef.current, {
+        height: '70%',
+        padding: 24
+        // opacity: 1
+      })
+      gsap.to(panelCloseRef.current, {
+        opacity: 1,
+      })
+    } else {
+      gsap.to(panelRef.current, {
+        height: '0',
+        padding: 0
+        // opacity: 0
+      })
+      gsap.to(panelCloseRef.current, {
+        opacity: 0,
+      })
+    }
+  }, [panelOpen])
+
+  useGSAP(function() {
+    if(vehiclePanel) {
+      gsap.to(vehiclePanelRef.current, {
+        transform: 'translateY(0)'
+      })
+    } else {
+      gsap.to(vehiclePanelRef.current, {
+        transform: 'translateY(100%)'
+      })
+    }
+  }, [vehiclePanel])
+
+  useGSAP(function() {
+    if(confirmRidePanel) {
+      gsap.to(confirmedRidePanelRef.current, {
+        transform: 'translateY(0)'
+      })
+    } else {
+      gsap.to(confirmedRidePanelRef.current, {
+        transform: 'translateY(100%)'
+      })
+    }
+  }, [confirmRidePanel])
+  
+  useGSAP(function() {
+    if(vehicleFound) {
+      gsap.to(vehicleFoundRef.current, {
+        transform: 'translateY(0)'
+      })
+    } else {
+      gsap.to(vehicleFoundRef.current, {
+        transform: 'translateY(100%)'
+      })
+    }
+  }, [vehicleFound])
+  
+  useGSAP(function() {
+    if(waitingForDriver) {
+      gsap.to(waitingForDriverRef.current, {
+        transform: 'translateY(0)'
+      })
+    } else {
+      gsap.to(waitingForDriverRef.current, {
+        transform: 'translateY(100%)'
+      })
+    }
+  }, [waitingForDriver])
   return (
-    <div>
-        <div className='h-screen pt-8 flex justify-between flex-col w-full bg-cover bg-center bg-[url(https://images.unsplash.com/photo-1619059558110-c45be64b73ae?q=80&w=2574&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)]'>
-            <img className='w-16 ml-8' src='https://cdn-assets-eu.frontify.com/s3/frontify-enterprise-files-eu/eyJwYXRoIjoid2VhcmVcL2ZpbGVcLzhGbTh4cU5SZGZUVjUxYVh3bnEyLnN2ZyJ9:weare:F1cOF9Bps96cMy7r9Y2d7affBYsDeiDoIHfqZrbcxAw?width=1200&height=417' alt='Uber Logo' />
-            <div className='bg-white pb-7 py-4 px-4'>
-                <h2 className='text-[30px] font-bold'>Get Started with Uber</h2>
-                <Link to="/login"  className='flex items-center justify-center w-full bg-black text-white py-3 rounded-lg mt-5'>Continue</Link>
-            </div>
+    <div className='h-screen relative overflow-hidden'>
+      <img className='w-16 absolute left-5 top-5' src="https://upload.wikimedia.org/wikipedia/commons/c/cc/Uber_logo_2018.png" alt="" />
+      <div className='h-screen w-screen'>
+        {/* image for temporary use  */}
+        <img className='h-full w-full object-cover' src="https://miro.medium.com/v2/resize:fit:1440/0*gwMx05pqII5hbfmX.gif" alt="" />
+      </div>
+      <div className='flex flex-col justify-end h-screen absolute top-0 w-full'>       
+        <div className='h-[30%] p-6 bg-white relative'>
+          <h5 ref={panelCloseRef} onClick={() => setPanelOpen(false)} className='absolute opacity-0 top-6 right-6 text-2xl'>
+            <i className='ri-arrow-down-wide-line'></i>
+          </h5>
+          <h4  className='text-2xl font-semibold'>Find a trip</h4>
+          <form onSubmit={e => {
+            submitHandler(e)
+          }}>
+            <div className="line absolute h-16 w-1 top-[40%] left-10 bg-gray-700 rounded-full"></div>
+            <input 
+              value={pickup}
+              onClick={() => setPanelOpen(true)}
+              onChange={e => setPickup(e.target.value)}
+              className='bg-[#eee] px-12 py-2 rounded-lg w-full mt-5' 
+              type="text" 
+              placeholder='Add a pick-up location' 
+            />
+            <input 
+              value={destination}
+              onClick={() => setPanelOpen(true)}
+              onChange={e => setDestination(e.target.value)}
+              className='bg-[#eee] px-12 py-2 rounded-lg w-full mt-5' 
+              type="text" 
+              placeholder='Enter your destination' 
+            />
+          </form>
         </div>
+        <div ref={panelRef} className='bg-white h-0'>
+          <LocationSearchPanel setPanelOpen={setPanelOpen} setVehiclePanel={setVehiclePanel} />
+        </div>
+      </div>
+      <div ref={vehiclePanelRef} className='fixed w-full z-10 bottom-0 bg-white px-3 py-10 pt-12'>
+        <VehiclePanel setConfirmedRidePanel={setConfirmedRidePanel} setVehiclePanel={setVehiclePanel} />
+      </div>
+      <div ref={confirmedRidePanelRef} className='fixed w-full z-10 bottom-0 translate-y-full bg-white px-3 py-6 pt-12'>
+        <ConfirmRide setConfirmedRidePanel={setConfirmedRidePanel} setVehicleFound={setVehicleFound} />
+      </div>
+      <div ref={vehicleFoundRef} className='fixed w-full z-10 bottom-0 bg-white translate-y-full px-3 py-6 pt-12'>
+          <LookingForDriver setVehicleFound={setVehicleFound} />
+      </div>
+      <div ref={waitingForDriverRef} className='fixed w-full z-10 bottom-0 bg-white px-3 py-6 pt-12'>
+          <WaitingForDriver waitingForDriver={waitingForDriver} />
+      </div>
     </div>
   )
 }
