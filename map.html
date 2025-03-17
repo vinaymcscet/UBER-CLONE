@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script type="text/javascript" src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerwithlabel/src/markerwithlabel.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/place/autocomplete/json?input=New+York&key=AIzaSyDO6OXkJGgjGBDC9ssEyluguSj_hnKMqK8"></script>
+  </head>
+  <body>
+    <input id="search" type="text" placeholder="Enter location" />
+    <script>
+      const input = document.getElementById("search");
+      const autocomplete = new google.maps.places.Autocomplete(input);
+    </script>
+  </body>
+</html>
