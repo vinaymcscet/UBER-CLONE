@@ -156,13 +156,17 @@ const getAutoCompleteSuggestions = async (input) => {
 };
 
 const getCaptainsInTheRadius = async (ltd, lng, radius) => {
-    const captains = await captainModel.find({
-        location: {
-            $geoWithin: {
-                $centerSphere: [ [ lng, ltd ], radius / 6371 ]
+       // Convert string coordinates to numbers if needed
+       const latitude = parseFloat(ltd);
+       const longitude = parseFloat(lng);
+       const radiusInKm = parseFloat(radius);
+        const captains = await captainModel.find({
+            location: {
+                $geoWithin: {
+                    $centerSphere: [ [ longitude, latitude ], radiusInKm / 6371 ]
+                }
             }
-        }
-    });
+        }).exec();
     console.log("getCaptainsInTheRadius", captains);
     return captains;
     // try {

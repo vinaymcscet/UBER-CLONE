@@ -1,3 +1,6 @@
+# commands
+
+- npx nodemon (run)
 # User Registration API
 
 ## Endpoint: `/users/register`
