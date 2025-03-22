@@ -324,3 +324,214 @@ curl -X POST http://localhost:3000/captains/register \
   curl -X GET http://localhost:3000/captains/logout \
   -H "Authorization: Bearer <token>"
 ```
+
+## Maps & Rides APIs
+
+### Get Coordinates API
+#### Endpoint: `/maps/get-coordinates`
+#### Method: GET
+#### Description:
+Gets the latitude and longitude coordinates for a given address using Google Maps Geocoding API.
+
+#### Request Headers:
+- `Authorization`: Bearer token required
+
+#### Query Parameters:
+- `address` (string, required, min length: 3): Location address
+
+#### Example Response:
+```json
+{
+  "success": true,
+  "coordinates": {
+    "latitude": 23.2599,
+    "longitude": 77.4126
+  }
+}
+```
+
+### Get Distance & Time API
+#### Endpoint: `/maps/get-distance-time`
+#### Method: GET
+#### Description:
+This endpoint calculates the distance and estimated travel time between two locations using the Google Maps Distance Matrix API.
+
+#### Request Headers:
+- `Authorization`: Bearer token required
+
+#### Query Parameters:
+- `origin` (string, required): Starting location address
+- `destination` (string, required): Ending location address
+
+#### Example Response:
+```json
+{
+  "success": true,
+  "data": {
+    "distance": {
+      "text": "5.2 km",
+      "meters": 5200
+    },
+    "duration": {
+      "text": "15 mins",
+      "seconds": 900
+    },
+    "origin": "Bhopal Railway Station, Bhopal, MP",
+    "destination": "MP Nagar, Bhopal, MP"
+  }
+}
+```
+
+#### Error Responses:
+- `400 Bad Request`: If origin or destination parameters are missing
+- `401 Unauthorized`: If bearer token is invalid or missing
+- `500 Internal Server Error`: If there's an error calculating distance/time
+
+#### Example Usage:
+```bash
+curl -X GET "http://localhost:3000/maps/get-distance-time?origin=Bhopal Railway Station&destination=MP Nagar" \
+-H "Authorization: Bearer <token>"
+```
+
+### Get Place Suggestions API
+#### Endpoint: `/maps/get-suggestions`
+#### Method: GET
+#### Description:
+Returns place suggestions based on user input text using Google Places Autocomplete API.
+
+#### Request Headers:
+- `Authorization`: Bearer token required
+
+#### Query Parameters:
+- `input` (string, required, min length: 2): Search text for location suggestions
+
+#### Example Response:
+```json
+{
+  "success": true,
+  "predictions": [
+    {
+      "placeId": "ChIJBVEmP-M9rjsR52LlrCcgHwE",
+      "description": "MP Nagar, Bhopal, Madhya Pradesh, India",
+      "mainText": "MP Nagar",
+      "secondaryText": "Bhopal, Madhya Pradesh, India",
+      "location": {
+        "latitude": 23.2313,
+        "longitude": 77.4326
+      },
+      "terms": [
+        {
+          "offset": 0,
+          "value": "MP Nagar"
+        },
+        {
+          "offset": 9,
+          "value": "Bhopal"
+        }
+      ],
+      "types": [
+        "locality",
+        "political"
+      ]
+    }
+  ]
+}
+```
+
+#### Error Responses:
+- `400 Bad Request`: If input parameter is missing or too short
+- `401 Unauthorized`: If bearer token is invalid or missing
+- `500 Internal Server Error`: If there's an error fetching suggestions
+
+#### Example Usage:
+```bash
+curl -X GET "http://localhost:3000/maps/get-suggestions?input=MP Nagar" \
+-H "Authorization: Bearer <token>"
+```
+
+### Create Ride API
+#### Endpoint: `/rides/create`
+#### Method: POST
+#### Description:
+Creates a new ride request with specified pickup location, destination, and vehicle type. Generates a unique OTP for ride verification.
+
+#### Request Headers:
+- `Authorization`: Bearer token required
+
+#### Request Body:
+```json
+{
+  "pickup": "Bhopal Railway Station",
+  "destination": "MP Nagar",
+  "vehicleType": "car"  // Possible values: "auto", "car", "moto"
+}
+```
+
+#### Example Response:
+```json
+{
+  "success": true,
+  "ride": {
+    "_id": "ride_id",
+    "user": "user_id",
+    "pickup": "Bhopal Railway Station",
+    "destination": "MP Nagar",
+    "fare": 230.75,
+    "status": "PENDING",
+    "vehicleType": "car",
+    "otp": "123456",
+    "createdAt": "2024-03-20T10:30:00.000Z",
+    "updatedAt": "2024-03-20T10:30:00.000Z"
+  }
+}
+```
+
+#### Error Responses:
+- `400 Bad Request`: If required fields are missing or invalid
+- `401 Unauthorized`: If bearer token is invalid or missing
+- `500 Internal Server Error`: If there's an error creating the ride
+
+#### Example Usage:
+```bash
+curl -X POST "http://localhost:3000/rides/create" \
+-H "Authorization: Bearer <token>" \
+-H "Content-Type: application/json" \
+-d '{
+  "pickup": "Bhopal Railway Station",
+  "destination": "MP Nagar",
+  "vehicleType": "car"
+}'
+```
+
+
+## Get Fare Estimation API
+
+### Endpoint: `/rides/get-fare`
+
+### Method: GET 
+
+### Description:
+This endpoint calculates the estimated fare for a ride based on pickup location, destination, and returns fare estimates for all vehicle types (auto, car, moto). It uses distance and duration from the Google Maps API for calculations.
+
+### Request Headers:
+- `Authorization`: Bearer token required
+
+### Query Parameters:
+- `pickup` (string, required): Pickup location address
+- `destination` (string, required): Destination location address
+
+### Example Response:
+```json
+{
+  "auto": 150.50,    // Base fare (₹30) + ₹10/km + ₹2/min
+  "car": 230.75,     // Base fare (₹50) + ₹15/km + ₹3/min
+  "moto": 95.25      // Base fare (₹20) + ₹8/km + ₹1.5/min
+}
+```
+### Example Response:
+```json
+
+curl -X GET "http://localhost:3000/rides/get-fare?pickup=Bhopal Railway Station&destination=MP Nagar" \
+-H "Authorization: Bearer <token>"
+
+```

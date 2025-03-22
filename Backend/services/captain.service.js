@@ -10,7 +10,6 @@ const createCaptain = async ({
   capacity,
   vehicleType,
 }) => {
-  console.log(firstname, lastname, email, password, color, plate, capacity, vehicleType);
   
   if (
     !firstname ||
