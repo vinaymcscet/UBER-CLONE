@@ -23,8 +23,6 @@ const getDistanceTimeController = async (req, res, next) => {
     const { origin, destination } = req.query;
     try {
         const distanceTime = await mapService.getDistanceTime(origin, destination);
-        console.log("distanceTime", distanceTime);
-        
         res.status(200).json(distanceTime);
     } catch (error) {
         res.status(500).json({ message: 'Internal server error' });
@@ -36,14 +34,28 @@ const getAutoCompleteSuggestionsController = async (req, res, next) => {
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
     }
-    const { input } = req.body;
-    console.log("input", input);
+    
+    const { input } = req.query;
+    
     try {
         const suggestions = await mapService.getAutoCompleteSuggestions(input);
-        console.log("suggestions", suggestions);
+        
+        if (!suggestions.success) {
+            return res.status(400).json(suggestions);
+        }
+        
         res.status(200).json(suggestions);
     } catch (error) {
-        res.status(500).json({ message: 'Internal server error' });
+        console.error('Places API Error:', {
+            message: error.message,
+            response: error.response?.data,
+            status: error.response?.status
+        });
+        
+        res.status(500).json({ 
+            success: false, 
+            error: 'Failed to fetch place suggestions'
+        });
     }
 }
 

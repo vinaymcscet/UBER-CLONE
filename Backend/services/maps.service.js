@@ -1,4 +1,5 @@
 const axios = require('axios');
+const captainModel = require('../models/captain.model');
 
 const getAddressCoordinate = async (address) => {
     const apiKey = process.env.GOOGLE_MAPS_API;
@@ -93,52 +94,118 @@ const getDistanceTime = async (origin, destination) => {
 
 const getAutoCompleteSuggestions = async (input) => {
     try {
-        console.log("Input:", input);
-        
         if (!input) {
             return { success: false, error: "Query is required" };
         }
 
         const apiKey = process.env.GOOGLE_MAPS_API;
-        const url = `https://places.googleapis.com/v1/places:autocomplete`;
-        const requestData = {
-            input: input,
-            languageCode: "en",
-            regionCode: "US",
-        };
+        const url = 'https://places.googleapis.com/v1/places:searchText';
 
-        const response = await axios.post(url, requestData, {
-            headers: { 
-                "Content-Type": "application/json",
-                "X-Goog-Api-Key": apiKey,
-                "X-Goog-FieldMask": "places.displayName,places.id"
+        const response = await axios.post(url, {
+            textQuery: input,
+            languageCode: "en",
+            // locationBias: {
+            //     rectangle: {
+            //         low: { latitude: 8.4, longitude: 68.7 },
+            //         high: { latitude: 37.6, longitude: 97.25 }
+            //     }
+            // },
+            // maxResultCount: 5
+        }, {
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Goog-Api-Key': apiKey,
+                'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress,places.location,places.types,places.plusCode,places.addressComponents'
             }
         });
-        console.log("Response:", response);
 
         if (response.data && response.data.places) {
             return {
                 success: true,
-                suggestions: response.data.suggestions.map(place => ({
-                    name: place.displayName.text,
-                    placeId: place.id
+                predictions: response.data.places.map(place => ({
+                    placeId: place.id,
+                    description: place.formattedAddress,
+                    mainText: place.displayName.text,
+                    secondaryText: place.addressComponents?.[0]?.shortText || '',
+                    referenceId: place.plusCode?.globalCode || '',
+                    location: place.location,
+                    terms: place.addressComponents?.map(component => ({
+                        offset: component.startIndex || 0,
+                        value: component.shortText || component.text
+                    })) || [],
+                    types: place.types || []
                 }))
             };
         } else {
             return {
                 success: false,
-                error: "No suggestions found"
+                error: 'No places found'
             };
         }
     } catch (error) {
+        console.error('Places API Error:', {
+            message: error.message,
+            response: error.response?.data,
+            status: error.response?.status
+        });
         return {
             success: false,
-            error: error.message
+            error: error.response?.data?.error?.message || 'Failed to get suggestions'
         };
     }
 };
+
+const getCaptainsInTheRadius = async (ltd, lng, radius) => {
+    const captains = await captainModel.find({
+        location: {
+            $geoWithin: {
+                $centerSphere: [ [ lng, ltd ], radius / 6371 ]
+            }
+        }
+    });
+    console.log("getCaptainsInTheRadius", captains);
+    return captains;
+    // try {
+    //     // Validate inputs
+    //     if (!ltd || !lng || !radius) {
+    //         throw new Error('Latitude, longitude and radius are required');
+    //     }
+
+    //     // Convert string coordinates to numbers if needed
+    //     const latitude = parseFloat(ltd);
+    //     const longitude = parseFloat(lng);
+    //     const radiusInKm = parseFloat(radius);
+
+    //     console.log("Searching for captains with params:", {
+    //         latitude,
+    //         longitude,
+    //         radiusInKm
+    //     });
+
+    //     // Make sure location field is properly indexed
+    //     await captainModel.collection.createIndex({ location: "2dsphere" });
+
+    //     const captains = await captainModel.find({
+    //         location: {
+    //             $geoWithin: {
+    //                 $centerSphere: [[longitude, latitude], radiusInKm / 6371] // MongoDB expects [lng, lat] order
+    //             }
+    //         },
+    //         isAvailable: true // Add this if you want only available captains
+    //     }).exec();
+
+    //     console.log(`Found ${captains.length} captains in ${radiusInKm}km radius`);
+    //     return captains;
+
+    // } catch (error) {
+    //     console.error("Error in getCaptainsInTheRadius:", error);
+    //     throw error;
+    // }
+}
+
 module.exports = {
     getAddressCoordinate,
     getDistanceTime,
-    getAutoCompleteSuggestions
+    getAutoCompleteSuggestions,
+    getCaptainsInTheRadius
 };
