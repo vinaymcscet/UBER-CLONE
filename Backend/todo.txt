@@ -1,0 +1,37 @@
+rides
+ Source des
+    long
+    late
+ target des
+    long
+    late
+ user_id
+ otp
+ status
+    pending
+    accepted
+    start
+    competed
+ captain
+    if status is pending then is column will be null
+
+
+function sendNotificationToCaptian(ride)
+{
+    1. run query to get all captain which are with in a range (ride)
+    2. Get captain
+    3. send Notification to captains
+}
+
+
+function acceptRide(ride, captain)
+{
+    1. make ride accepted
+    2. set captain id
+}
+
+function startRide(ride, captain)
+{
+    1. enter otp
+    2. make ride start
+}
