@@ -27,7 +27,7 @@ const createRideController = async (req, res, next) => {
     const captainsInRadius = await mapService.getCaptainsInTheRadius(
       pickupCoordinates.coordinates.latitude,
       pickupCoordinates.coordinates.longitude,
-      5
+      50
     );
     ride.otp = "";
     console.log("captainInRadiusSocket", captainsInRadius);

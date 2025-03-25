@@ -37,6 +37,7 @@ const getDistanceTime = async (origin, destination) => {
     }
     const originAddr = await getAddressCoordinate(origin);
     const destinationAddr = await getAddressCoordinate(destination);
+    console.log("originAddr", originAddr);
     const apiKey = process.env.GOOGLE_MAPS_API;
     
     // const url = `https://maps.googleapis.com/maps/api/distancematrix/json?origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}&key=${apiKey}`;
@@ -169,42 +170,6 @@ const getCaptainsInTheRadius = async (ltd, lng, radius) => {
         }).exec();
     console.log("getCaptainsInTheRadius", captains);
     return captains;
-    // try {
-    //     // Validate inputs
-    //     if (!ltd || !lng || !radius) {
-    //         throw new Error('Latitude, longitude and radius are required');
-    //     }
-
-    //     // Convert string coordinates to numbers if needed
-    //     const latitude = parseFloat(ltd);
-    //     const longitude = parseFloat(lng);
-    //     const radiusInKm = parseFloat(radius);
-
-    //     console.log("Searching for captains with params:", {
-    //         latitude,
-    //         longitude,
-    //         radiusInKm
-    //     });
-
-    //     // Make sure location field is properly indexed
-    //     await captainModel.collection.createIndex({ location: "2dsphere" });
-
-    //     const captains = await captainModel.find({
-    //         location: {
-    //             $geoWithin: {
-    //                 $centerSphere: [[longitude, latitude], radiusInKm / 6371] // MongoDB expects [lng, lat] order
-    //             }
-    //         },
-    //         isAvailable: true // Add this if you want only available captains
-    //     }).exec();
-
-    //     console.log(`Found ${captains.length} captains in ${radiusInKm}km radius`);
-    //     return captains;
-
-    // } catch (error) {
-    //     console.error("Error in getCaptainsInTheRadius:", error);
-    //     throw error;
-    // }
 }
 
 module.exports = {

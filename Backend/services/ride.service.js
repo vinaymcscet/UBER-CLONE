@@ -8,6 +8,7 @@ async function getFare(pickup, destination) {
     throw new Error("pickup and destination are required");
   }
   const distanceTime = await mapService.getDistanceTime(pickup, destination);
+  console.log("originAddr", distanceTime);
   // Define fare rates for different vehicle types
   const baseFare = {
     auto: 30,
