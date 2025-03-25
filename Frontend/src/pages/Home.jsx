@@ -193,7 +193,6 @@ const submitHandler = (e) => {
         {/* image for temporary use  */}
         <img className='h-full w-full object-cover' src="https://miro.medium.com/v2/resize:fit:1440/0*gwMx05pqII5hbfmX.gif" alt="" />
       </div>
-      console.log("response", pickupSuggestions)
       <div className='flex flex-col justify-end h-screen absolute top-0 w-full'>       
         <div className='h-[30%] p-6 bg-white relative'>
           <h5 ref={panelCloseRef} onClick={() => setPanelOpen(false)} className='absolute opacity-0 top-6 right-6 text-2xl'>

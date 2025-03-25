@@ -157,19 +157,50 @@ const getAutoCompleteSuggestions = async (input) => {
 };
 
 const getCaptainsInTheRadius = async (ltd, lng, radius) => {
-       // Convert string coordinates to numbers if needed
-       const latitude = parseFloat(ltd);
-       const longitude = parseFloat(lng);
-       const radiusInKm = parseFloat(radius);
+    try {
+        // Validate inputs
+        if (!ltd || !lng || !radius) {
+            throw new Error('Latitude, longitude and radius are required');
+        }
+
+        const latitude = parseFloat(ltd);
+        const longitude = parseFloat(lng);
+        const radiusInKm = parseFloat(radius);
+
+        // Validate parsed values
+        if (isNaN(latitude) || isNaN(longitude) || isNaN(radiusInKm)) {
+            throw new Error('Invalid coordinates or radius format');
+        }
+
+        console.log('Searching with params:', {
+            latitude,
+            longitude,
+            radiusInKm,
+            query: {
+                location: {
+                    $geoWithin: {
+                        $centerSphere: [[longitude, latitude], radiusInKm / 6371]
+                    }
+                }
+            }
+        });
+
+        // Find available captains only
         const captains = await captainModel.find({
             location: {
                 $geoWithin: {
-                    $centerSphere: [ [ longitude, latitude ], radiusInKm / 6371 ]
+                    $centerSphere: [[longitude, latitude], radiusInKm / 6371]
                 }
             }
         }).exec();
-    console.log("getCaptainsInTheRadius", captains);
-    return captains;
+
+        console.log(`Found ${captains.length} captains within ${radiusInKm}km radius`);
+        
+        return captains;
+    } catch (error) {
+        console.error('getCaptainsInTheRadius error:', error);
+        throw error;
+    }
 }
 
 module.exports = {
